@@ -13,6 +13,13 @@ from fast_study.schemas import (
 app = FastAPI()
 
 database = []
+database_mock = [
+    {
+        'username': 'alice',
+        'email': 'alice@example.com',
+        'id': 1,
+    }
+]
 
 
 @app.get('/', status_code=HTTPStatus.OK, response_model=Message)
@@ -57,6 +64,20 @@ def delete_user(user_id: int):
     del database[user_id - 1]
 
     return {'message': 'User deleted'}
+
+
+@app.get(
+    '/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic
+)
+def read_user_by_id(user_id: int):
+    if user_id > len(database_mock) or user_id < 1:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+
+    user_with_id = database_mock[user_id - 1]
+
+    return user_with_id
 
 
 # @app.get(
